@@ -2,6 +2,8 @@ package org.spree.culture.source;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.spree.core.event.EventSource;
@@ -19,26 +21,21 @@ public class CultureEventSource implements EventSource<CultureEvent> {
     private static final Logger LOG = Logger.getLogger(CultureEventSource.class.getName());
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'hh:mm:ss";
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
-    protected static final Gson GSON = new GsonBuilder().setDateFormat(DATE_FORMAT).create();
     private static final String CULTURE_URL = "http://www.culture.ru/api/v1/materials";
-    public static final String PARAMS = "?type=event&city=%s&page=%s&page_size=%s&start_date_from=%s";
 
-    private HttpRequestService httpRequestService;
-
-    public CultureEventSource(HttpRequestService httpRequestService) {
-        this.httpRequestService = httpRequestService;
-    }
+    public static final int VOLOGDA_CITY_ID = 559;
 
     @Override
     public Collection<CultureEvent> getNew() {
         try {
-            Unirest.get(CULTURE_URL)
+            HttpResponse<JsonNode> jsonNodeHttpResponse = Unirest.get(CULTURE_URL)
                     .queryString("type", "event")
-                    .queryString("cyty")
+                    .queryString("city", VOLOGDA_CITY_ID)
+                    .queryString("start_date_from", SIMPLE_DATE_FORMAT.format(new Date()))
                     .asJson();
+            return null;
         } catch (UnirestException e) {
             throw new CanNotGetCultureEvents(e);
         }
-        URL url = new URL(String.format(CULTURE_URL + PARAMS, cityId, page, count, SIMPLE_DATE_FORMAT.format(new Date())));
     }
 }
