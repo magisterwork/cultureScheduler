@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CultureSchedulerController {
 
-    @RequestMapping("/init")
+    @RequestMapping("/status")
     public String index() {
         return "Success";
     }
