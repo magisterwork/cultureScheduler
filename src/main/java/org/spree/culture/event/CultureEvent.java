@@ -1,43 +1,56 @@
 package org.spree.culture.event;
 
 import org.spree.core.event.Event;
+import org.spree.culture.util.dto.CultureDto;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class CultureEvent implements Event {
 
+    public static final String CULTURE_ID = "CULTURE";
+    private CultureDto source;
+
+    public CultureEvent(CultureDto material) {
+        this.source = material;
+    }
+
     @Override
     public String getName() {
-        return null;
+        return source.name;
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return source.description;
     }
 
     @Override
     public Calendar getStartDate() {
-        return null;
+        GregorianCalendar date = new GregorianCalendar();
+        date.setTimeInMillis(source.start);
+        return date;
     }
 
     @Override
     public Calendar getFinishDate() {
-        return null;
+        GregorianCalendar date = new GregorianCalendar();
+        date.setTimeInMillis(source.end);
+        return date;
     }
 
     @Override
     public String getImageUrl() {
-        return null;
+        return "https://all.culture.ru/uploads/" + source.image.name;
     }
 
     @Override
     public String getExtId() {
-        return null;
+        return String.valueOf(source._id);
     }
 
     @Override
     public String getSystemId() {
-        return null;
+        return CULTURE_ID;
     }
 }
