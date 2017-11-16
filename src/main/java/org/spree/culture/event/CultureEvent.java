@@ -1,10 +1,14 @@
 package org.spree.culture.event;
 
+import org.spree.core.category.Category;
+import org.spree.core.category.CategoryImpl;
 import org.spree.core.event.Event;
 import org.spree.culture.util.dto.CultureDto;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 public class CultureEvent implements Event {
 
@@ -52,5 +56,10 @@ public class CultureEvent implements Event {
     @Override
     public String getSystemId() {
         return CULTURE_ID;
+    }
+
+    @Override
+    public List<Category> getCategories() {
+        return Collections.singletonList(new CategoryImpl(source.category.name));
     }
 }
