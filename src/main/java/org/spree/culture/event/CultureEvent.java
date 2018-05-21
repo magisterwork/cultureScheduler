@@ -59,6 +59,11 @@ public class CultureEvent implements Event {
     }
 
     @Override
+    public int getMembersCount() {
+        return source.visitorsCount != null ? source.visitorsCount : 0;
+    }
+
+    @Override
     public List<Category> getCategories() {
         return Collections.singletonList(new CategoryImpl(source.category.name));
     }
