@@ -1,5 +1,6 @@
 package org.spree.culture.event;
 
+import org.jsoup.Jsoup;
 import org.spree.core.category.Category;
 import org.spree.core.category.CategoryImpl;
 import org.spree.core.event.Event;
@@ -26,7 +27,7 @@ public class CultureEvent implements Event {
 
     @Override
     public String getDescription() {
-        return source.description;
+        return Jsoup.parse(source.description).text();
     }
 
     @Override

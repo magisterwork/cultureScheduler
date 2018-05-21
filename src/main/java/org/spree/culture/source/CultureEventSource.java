@@ -27,29 +27,13 @@ public class CultureEventSource implements EventSource<CultureEvent> {
 
     public static final int VOLOGDA_CITY_ID = 559;
 
+    {
+        setupObjectMapper();
+    }
+
     @Override
     public Collection<CultureEvent> getNew() {
         try {
-            Unirest.setObjectMapper(new ObjectMapper() {
-                private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper
-                        = new com.fasterxml.jackson.databind.ObjectMapper();
-
-                public <T> T readValue(String value, Class<T> valueType) {
-                    try {
-                        return jacksonObjectMapper.readValue(value, valueType);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                public String writeValue(Object value) {
-                    try {
-                        return jacksonObjectMapper.writeValueAsString(value);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
             HttpResponse<CultureResponse> response = Unirest.get(CULTURE_URL)
                     .queryString("start", GregorianCalendar.getInstance().getTimeInMillis())
                     .asObject(CultureResponse.class);
@@ -61,6 +45,29 @@ public class CultureEventSource implements EventSource<CultureEvent> {
         } catch (UnirestException e) {
             throw new CanNotGetCultureEvents(e);
         }
+    }
+
+    private void setupObjectMapper() {
+        Unirest.setObjectMapper(new ObjectMapper() {
+            private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper
+                    = new com.fasterxml.jackson.databind.ObjectMapper();
+
+            public <T> T readValue(String value, Class<T> valueType) {
+                try {
+                    return jacksonObjectMapper.readValue(value, valueType);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            public String writeValue(Object value) {
+                try {
+                    return jacksonObjectMapper.writeValueAsString(value);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     private void checkStatus(HttpResponse<CultureResponse> response) {
