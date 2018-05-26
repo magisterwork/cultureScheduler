@@ -68,4 +68,14 @@ public class CultureEvent implements Event {
     public List<Category> getCategories() {
         return Collections.singletonList(new CategoryImpl(source.category.name));
     }
+
+    @Override
+    public double getLatitude() {
+        return 0;
+    }
+
+    @Override
+    public double getLongitude() {
+        return 0;
+    }
 }
