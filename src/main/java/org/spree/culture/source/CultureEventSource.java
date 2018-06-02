@@ -2,7 +2,6 @@ package org.spree.culture.source;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -25,7 +24,7 @@ public class CultureEventSource implements EventSource<CultureEvent> {
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
     private static final String CULTURE_URL = "https://all.culture.ru/api/2.2/events";
 
-    public static final int VOLOGDA_CITY_ID = 559;
+    public static final String VOLOGDA_REGION_LOCALES = "182";
 
     {
         setupObjectMapper();
@@ -36,6 +35,9 @@ public class CultureEventSource implements EventSource<CultureEvent> {
         try {
             HttpResponse<CultureResponse> response = Unirest.get(CULTURE_URL)
                     .queryString("start", GregorianCalendar.getInstance().getTimeInMillis())
+                    .queryString("locales", VOLOGDA_REGION_LOCALES)
+                    .queryString("limit", 100)
+                    .queryString("sort", "-_id")
                     .asObject(CultureResponse.class);
             checkStatus(response);
             List<CultureDto> events = response.getBody().events;
