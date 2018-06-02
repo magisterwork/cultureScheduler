@@ -17,7 +17,7 @@ public class EventScheduler {
         this.source = source;
     }
 
-    @Scheduled(fixedDelay = 2000)
+    @Scheduled(fixedDelay = 20000)
     public void load() {
         for (Event event : source.getNew()) {
             new JpaStoredEvent(new JpaEvent(event), repository).save();
