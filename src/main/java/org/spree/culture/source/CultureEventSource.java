@@ -5,6 +5,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
 import org.spree.core.event.EventSource;
 import org.spree.culture.event.CultureEvent;
 import org.spree.culture.exception.CanNotGetCultureEvents;
@@ -24,7 +25,9 @@ public class CultureEventSource implements EventSource<CultureEvent> {
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
     private static final String CULTURE_URL = "https://all.culture.ru/api/2.2/events";
 
-    public static final String VOLOGDA_REGION_LOCALES = "182";
+    private static final String REGION_LOCALES = "182,166,177,187,185,202,85,200,191";
+
+    private ThreadLocal<SearchResult> previousResult = new InheritableThreadLocal<>();
 
     {
         setupObjectMapper();
@@ -33,13 +36,24 @@ public class CultureEventSource implements EventSource<CultureEvent> {
     @Override
     public Collection<CultureEvent> getNew() {
         try {
-            HttpResponse<CultureResponse> response = Unirest.get(CULTURE_URL)
+            int count = 100;
+            int offset;
+            if (previousResult.get() == null || previousResult.get().total <= previousResult.get().offset + previousResult.get().count) {
+                offset = 0;
+            } else {
+                offset = previousResult.get().offset + count;
+            }
+
+            HttpRequest request = Unirest.get(CULTURE_URL)
                     .queryString("start", GregorianCalendar.getInstance().getTimeInMillis())
-                    .queryString("locales", VOLOGDA_REGION_LOCALES)
-                    .queryString("limit", 100)
+                    .queryString("locales", REGION_LOCALES)
+                    .queryString("limit", count)
                     .queryString("sort", "-_id")
+                    .queryString("offset", offset);
+            HttpResponse<CultureResponse> response = request
                     .asObject(CultureResponse.class);
             checkStatus(response);
+            previousResult.set(new SearchResult(response.getBody().total, offset, count));
             List<CultureDto> events = response.getBody().events;
             return events.stream()
                     .map(CultureEvent::new)
@@ -76,5 +90,18 @@ public class CultureEventSource implements EventSource<CultureEvent> {
         if (response.getStatus() != 200) {
             throw new CanNotGetCultureEvents("Response status is " + response.getStatus());
         }
+    }
+
+    private static class SearchResult {
+
+        public SearchResult(int total, int offset, int count) {
+            this.total = total;
+            this.offset = offset;
+            this.count = count;
+        }
+
+        int total;
+        int offset;
+        int count;
     }
 }
