@@ -46,7 +46,7 @@ public class CultureEventSource implements EventSource<CultureEvent> {
 
             HttpRequest request = Unirest.get(CULTURE_URL)
                     .queryString("start", GregorianCalendar.getInstance().getTimeInMillis())
-                    .queryString("locales", REGION_LOCALES)
+                    /*.queryString("locales", REGION_LOCALES)*/
                     .queryString("limit", count)
                     .queryString("sort", "-_id")
                     .queryString("offset", offset);
